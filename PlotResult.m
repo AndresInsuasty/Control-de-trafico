@@ -22,7 +22,7 @@ function varargout = PlotResult(varargin)
 
 % Edit the above text to modify the response to help PlotResult
 
-% Last Modified by GUIDE v2.5 28-Jun-2018 20:19:23
+% Last Modified by GUIDE v2.5 30-Aug-2018 20:39:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -137,7 +137,8 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu1
-global Column Row C bandera Names_Variable window
+global Column Row C bandera Names_Variable window Data1
+set(handles.pushbutton3,'Visible','off')
 Column=get(hObject,'Value')+3
 [RowC ColC]=size(C);
 bandera2=0;
@@ -176,8 +177,10 @@ window=window+1
 if window>1
     close Figure 1
 end
+Data1=Data;
 figure(1)
 plot(Data,'b')
+grid on
 hold on
 title('Vissim Data Plot');
 ylabel(cell2mat(Names_Variable(Column)));
@@ -231,7 +234,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global bandera2 C2 Names_Variable2 FileName2
-set(handles.popupmenu3,'Visible','off')
+
 set(handles.text17,'Visible','off')
 [FileName2,PathName] = uigetfile('*.txt','SeleC2t the VISSIM network Results file');
 set(handles.text16,'String',FileName2)
@@ -264,7 +267,7 @@ function popupmenu3_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu3 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu3
-global Column2 Row2 C2 bandera2 Names_Variable2 FileName2 FileName1
+global Data2 Column2 Row2 C2 bandera2 Names_Variable2 FileName2 FileName1
 Column2=get(hObject,'Value')+3
 [RowC ColC]=size(C2);
 bandera3=0;
@@ -299,12 +302,15 @@ set(handles.text24,'String',strMinimo);
 Maximo=max(Data);
 strMaximo=num2str(Maximo);
 set(handles.text22,'String',strMaximo);
+Data2=Data;
 figure(1)
 plot(Data,'r')
+grid on
 hold on
 ylabel(cell2mat(Names_Variable2(Column2)));
 xlabel('Time Intervals');
 legend(FileName1,FileName2);
+
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu3_CreateFcn(hObject, eventdata, handles)
@@ -335,6 +341,151 @@ Row2=get(hObject,'Value')
 % --- Executes during object creation, after setting all properties.
 function popupmenu4_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to popupmenu4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global Data2 Data1 Data3 FileName1 FileName2 FileName3
+Data1=cumtrapz(Data1);
+Data2=cumtrapz(Data2);
+Data3=cumtrapz(Data3);
+figure(2)
+plot(Data1,'b','LineWidth',2)
+hold on
+plot(Data2,'r','LineWidth',2)
+hold on
+plot(Data3,'g','LineWidth',2)
+xlabel('Time Intervals');
+title('Integral');
+ylabel('Power');
+legend(FileName1,FileName2,FileName3);
+grid on
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global bandera3 C3 Names_Variable3 FileName3
+
+set(handles.text37,'Visible','on')
+[FileName3,PathName] = uigetfile('*.txt','SeleC2t the VISSIM network Results file');
+set(handles.text36,'String',FileName3)
+T = readtable(FileName3);
+[f size_Var]=size(T.Properties.VariableNames);
+Names_Variable3=T.Properties.VariableNames
+C3=table2cell(T);
+bandera3=1;
+i=0;
+while i==0
+    if size(cell2mat(C3(bandera3,2)))==size(cell2mat(C3(bandera3+1,2)))
+        bandera3=bandera3+1;
+    else
+        i=1;
+    end
+    
+end
+Names_Road=C3(1:bandera3,3);
+set(handles.popupmenu8,'Visible','on')
+set(handles.text38,'Visible','on')
+set(handles.popupmenu8,'String',Names_Road);
+set(handles.popupmenu7,'String',Names_Variable3(4:end)');
+
+% --- Executes on selection change in popupmenu7.
+function popupmenu7_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu7 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu7
+global Data3 Column3 Row3 C3 bandera3 Names_Variable3 FileName2 FileName1 FileName3
+Column3=get(hObject,'Value')+3
+[RowC ColC]=size(C3);
+bandera4=0;
+Data=[];
+i=0;
+while i==0
+    if ((Row3+(bandera3*bandera4))<RowC)
+        if size(cell2mat(C3(Row3+(bandera3*bandera4),1)))==size(cell2mat(C3(Row3+(bandera3*bandera4)+1,1)))
+            if cell2mat(C3(Row3+(bandera3*bandera4),1))==cell2mat(C3(Row3+(bandera3*bandera4)+1,1))
+                if isnan(cell2mat(C3(Row3+(bandera3*bandera4),Column3)))==1
+                    i=1;
+                else
+                    Data(bandera4+1)=cell2mat(C3(Row3+(bandera3*bandera4),Column3));
+                    bandera4=bandera4+1;
+                end
+            else
+                i=1;
+            end
+        else
+            i=1;
+        end
+    else
+        i=1;
+    end
+end
+Promedio=mean(Data);
+strPromedio=num2str(Promedio);
+set(handles.text40,'String',strPromedio);
+Minimo=min(Data);
+strMinimo=num2str(Minimo);
+set(handles.text44,'String',strMinimo);
+Maximo=max(Data);
+strMaximo=num2str(Maximo);
+set(handles.text42,'String',strMaximo);
+Data3=Data;
+figure(1)
+plot(Data,'g')
+grid on
+hold on
+ylabel(cell2mat(Names_Variable3(Column3)));
+xlabel('Time Intervals');
+legend(FileName1,FileName2,FileName3);
+set(handles.pushbutton3,'Visible','on')
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu7_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu8.
+function popupmenu8_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu8 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu8
+global Row3
+set(handles.popupmenu7,'Visible','on')
+set(handles.text37,'Visible','on')
+Row3=get(hObject,'Value')
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu8_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
