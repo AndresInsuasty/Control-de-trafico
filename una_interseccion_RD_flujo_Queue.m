@@ -10,7 +10,7 @@ vis.LoadNet([ruta_actual '\test1.inpx']);
 vis.LoadLayout([ruta_actual '\test1.layx']);
 %% Parametros de Simulación
 sim=vis.Simulation;
-period_time = 5*3600;
+period_time = 22500;%6.25hrs
 random_seed = 42;
 sim.set('AttValue','SimPeriod', period_time);
 sim.set('AttValue','RandSeed', random_seed);
@@ -171,69 +171,71 @@ for i=0:((period_time*step_time)-2)
      
   tiempo = sim.get('AttValue', 'SimSec');
   
-% %% para cambiar flujos de trafico durante la simulación
-%   switch tiempo
-%       case 500
-%         q1 = 300; %flujo de entrada
-%         q2 = 10000; %Flujo de entrada
-%         q3 = 300;%Flujo de entrada
-%         q4 = 300;%Flujo de entrada
-%         vehins = vnet.VehicleInputs;
-%         vehin_1 = vehins.ItemByKey(1);
-%         vehin_1.set('AttValue','Volume(1)',q1);
-%         vehin_2 = vehins.ItemByKey(2);
-%         vehin_2.set('AttValue','Volume(1)',q2);
-%         vehin_3 = vehins.ItemByKey(3);
-%         vehin_3.set('AttValue','Volume(1)',q3);
-%         vehin_4 = vehins.ItemByKey(4);
-%         vehin_4.set('AttValue','Volume(1)',q4);
-%         
-%       case 1000
-%         q1 = 500; %flujo de entrada
-%         q2 = 500; %Flujo de entrada
-%         q3 = 500;%Flujo de entrada
-%         q4 = 500;%Flujo de entrada
-%         vehins = vnet.VehicleInputs;
-%         vehin_1 = vehins.ItemByKey(1);
-%         vehin_1.set('AttValue','Volume(1)',q1);
-%         vehin_2 = vehins.ItemByKey(2);
-%         vehin_2.set('AttValue','Volume(1)',q2);
-%         vehin_3 = vehins.ItemByKey(3);
-%         vehin_3.set('AttValue','Volume(1)',q3);
-%         vehin_4 = vehins.ItemByKey(4);
-%         vehin_4.set('AttValue','Volume(1)',q4);
-% 
-%       case 1500
-%         q1 = 1000; %flujo de entrada
-%         q2 = 1000; %Flujo de entrada
-%         q3 = 1000;%Flujo de entrada
-%         q4 = 1000;%Flujo de entrada
-%         vehins = vnet.VehicleInputs;
-%         vehin_1 = vehins.ItemByKey(1);
-%         vehin_1.set('AttValue','Volume(1)',q1);
-%         vehin_2 = vehins.ItemByKey(2);
-%         vehin_2.set('AttValue','Volume(1)',q2);
-%         vehin_3 = vehins.ItemByKey(3);
-%         vehin_3.set('AttValue','Volume(1)',q3);
-%         vehin_4 = vehins.ItemByKey(4);
-%         vehin_4.set('AttValue','Volume(1)',q4);
-%         
-%       case 2000
-%         q1 = 1200; %flujo de entrada
-%         q2 = 1200; %Flujo de entrada
-%         q3 = 1200;%Flujo de entrada
-%         q4 = 1200;%Flujo de entrada
-%         vehins = vnet.VehicleInputs;
-%         vehin_1 = vehins.ItemByKey(1);
-%         vehin_1.set('AttValue','Volume(1)',q1);
-%         vehin_2 = vehins.ItemByKey(2);
-%         vehin_2.set('AttValue','Volume(1)',q2);
-%         vehin_3 = vehins.ItemByKey(3);
-%         vehin_3.set('AttValue','Volume(1)',q3);
-%         vehin_4 = vehins.ItemByKey(4);
-%         vehin_4.set('AttValue','Volume(1)',q4);         
-% 
-%   end
+%% para cambiar flujos de trafico durante la simulación
+  switch tiempo
+      case 4500
+        q1 = 1500; %flujo de entrada
+        q2 = 1000; %Flujo de entrada
+        q3 = 1500;%Flujo de entrada
+        q4 = 1000;%Flujo de entrada
+        vehins = vnet.VehicleInputs;
+        vehin_1 = vehins.ItemByKey(1);
+        vehin_1.set('AttValue','Volume(1)',q1);
+        vehin_2 = vehins.ItemByKey(2);
+        vehin_2.set('AttValue','Volume(1)',q2);
+        vehin_3 = vehins.ItemByKey(3);
+        vehin_3.set('AttValue','Volume(1)',q3);
+        vehin_4 = vehins.ItemByKey(4);
+        vehin_4.set('AttValue','Volume(1)',q4);
+        
+      case 9000
+        q1 = 1000; %flujo de entrada
+        q2 = 1500; %Flujo de entrada
+        q3 = 1000;%Flujo de entrada
+        q4 = 1500;%Flujo de entrada
+        vehins = vnet.VehicleInputs;
+        vehin_1 = vehins.ItemByKey(1);
+        vehin_1.set('AttValue','Volume(1)',q1);
+        vehin_2 = vehins.ItemByKey(2);
+        vehin_2.set('AttValue','Volume(1)',q2);
+        vehin_3 = vehins.ItemByKey(3);
+        vehin_3.set('AttValue','Volume(1)',q3);
+        vehin_4 = vehins.ItemByKey(4);
+        vehin_4.set('AttValue','Volume(1)',q4);
+        
+        case 13500
+        q1 = 1000; %flujo de entrada
+        q2 = 500; %Flujo de entrada
+        q3 = 1000;%Flujo de entrada
+        q4 = 500;%Flujo de entrada
+        vehins = vnet.VehicleInputs;
+        vehin_1 = vehins.ItemByKey(1);
+        vehin_1.set('AttValue','Volume(1)',q1);
+        vehin_2 = vehins.ItemByKey(2);
+        vehin_2.set('AttValue','Volume(1)',q2);
+        vehin_3 = vehins.ItemByKey(3);
+        vehin_3.set('AttValue','Volume(1)',q3);
+        vehin_4 = vehins.ItemByKey(4);
+        vehin_4.set('AttValue','Volume(1)',q4);
+        
+        case 18000
+        q1 = 500; %flujo de entrada
+        q2 = 1000; %Flujo de entrada
+        q3 = 500;%Flujo de entrada
+        q4 = 1000;%Flujo de entrada
+        vehins = vnet.VehicleInputs;
+        vehin_1 = vehins.ItemByKey(1);
+        vehin_1.set('AttValue','Volume(1)',q1);
+        vehin_2 = vehins.ItemByKey(2);
+        vehin_2.set('AttValue','Volume(1)',q2);
+        vehin_3 = vehins.ItemByKey(3);
+        vehin_3.set('AttValue','Volume(1)',q3);
+        vehin_4 = vehins.ItemByKey(4);
+        vehin_4.set('AttValue','Volume(1)',q4);
+
+             
+
+  end
 
 
       
