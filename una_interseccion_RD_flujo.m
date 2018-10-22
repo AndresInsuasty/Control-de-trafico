@@ -10,8 +10,7 @@ vis.LoadNet([ruta_actual '\test1.inpx']);
 vis.LoadLayout([ruta_actual '\test1.layx']);
 %% Parametros de Simulación
 sim=vis.Simulation;
-period_time = 22500;%6.25hrs
-%period_time = 3600;
+period_time = 5*3600;
 random_seed = 42;
 sim.set('AttValue','SimPeriod', period_time);
 sim.set('AttValue','RandSeed', random_seed);
@@ -47,7 +46,6 @@ links=vnet.Links;
 link_1=links.ItemByKey(1);
 %% Inicializacion de parametros
 tiempoCiclo=115*step_time; %tiempo de rojo+verde de la fase de los semaforos, tiempo*step_time
-
 flujo_inicial1 = 0;
 flujo_inicial2 = 0;
 flujo_inicial3 = 0;
@@ -56,31 +54,17 @@ flujo_final1 = 0;
 flujo_final2 = 0;
 flujo_final3 = 0;
 flujo_final4 = 0;
-
-cola1 = vnet.QueueCounter.ItemByKey(1);
-cola2 = vnet.QueueCounter.ItemByKey(2);
-cola3 = vnet.QueueCounter.ItemByKey(3);
-cola4 = vnet.QueueCounter.ItemByKey(4);
-cola5 = vnet.QueueCounter.ItemByKey(5);
-cola6 = vnet.QueueCounter.ItemByKey(6);
-cola7 = vnet.QueueCounter.ItemByKey(7);
-cola8 = vnet.QueueCounter.ItemByKey(8);
-
 contador=0;
 Tspan = 1000;
-x0 = [28 28 28 28 10]; %tiempos iniciales para semaforos
-%x0 = [30 30 30 30 30]; %tiempos iniciales para semaforos
-s_flujo = [172 289 228 255]; %valores de saturacion de las calles
-s_queue = [100 130 100 130];
-qin = [0 0 0 0];
-tiempo = 0;
+x0 = (tiempoCiclo/4)*[1 1 1 1]; %tiempos iniciales para semaforos
+s = [172 289 228 255]; %valores de saturacion de las calles
+qin = [0 0];
 x = x0;
-bandera =1;
 
 %% Simulacion principal
-while tiempo<period_time
+for i=0:((period_time*step_time)-2)
  sim.RunSingleStep;
- tiempo = sim.get('AttValue', 'SimSec');
+ 
  
 %  if contador == 0   %Flujo de trafico al inicio de cada ciclo
 %      flujo_inicial1 = vnet.DataCollectionMeasurement.ItemByKey(1).AttValue('Vehs(Current,Current,All)');
@@ -96,144 +80,133 @@ while tiempo<period_time
  %semaforo2 = tiempoCiclo-semaforo1; %con esta resta se asegura el ciclo sea "tiempoCiclo"
  
      if contador<=semaforo1
+         if (contador==0)
+              sg_1.set('AttValue','State',2); % 1:rojo 2:amarillo 3:verde
+              sim.RunSingleStep;
+              contador=contador+1;
+         end
+        
          sg_1.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
      elseif (contador>semaforo1)&&(contador<=(semaforo1+semaforo2))
+         if (contador==(semaforo1+1))
+              sg_2.set('AttValue','State',2); % 1:rojo 2:amarillo 3:verde
+              sim.RunSingleStep;
+              contador=contador+1;
+         end
          sg_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_2.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
      elseif (contador > (semaforo1+semaforo2) )&&(contador <= (semaforo1+semaforo2+semaforo3) )
+         if (contador==(semaforo1+semaforo2+1))
+              sg_3.set('AttValue','State',2); % 1:rojo 2:amarillo 3:verde
+              sim.RunSingleStep;
+              contador=contador+1;
+         end
          sg_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_3.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
-     elseif (contador > (semaforo1+semaforo2+semaforo3) )&&(contador <=(semaforo1+semaforo2+semaforo3+semaforo4))
+     elseif (contador > (semaforo1+semaforo2+semaforo3) )&&(contador <=tiempoCiclo)
+         if (contador==(semaforo1+semaforo2+semaforo3+1))
+              sg_4.set('AttValue','State',2); % 1:rojo 2:amarillo 3:verde
+              sim.RunSingleStep;
+              contador=contador+1;
+         end
          sg_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg_4.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
      end
      
-
+     contador = contador+1;
      
-     if contador == semaforo1+semaforo2+semaforo3+semaforo4 % Si ya se cumple el ciclo, se mide flujos y se reinicia "contador"
-         
-         contador=0;
+     if contador == tiempoCiclo % Si ya se cumple el ciclo, se mide flujos y se reinicia "contador"
          flujo_final1 = vnet.DataCollectionMeasurement.ItemByKey(1).AttValue('Vehs(Current,Current,All)');
          flujo_final2 = vnet.DataCollectionMeasurement.ItemByKey(2).AttValue('Vehs(Current,Current,All)');
          flujo_final3 = vnet.DataCollectionMeasurement.ItemByKey(3).AttValue('Vehs(Current,Current,All)');
          flujo_final4 = vnet.DataCollectionMeasurement.ItemByKey(4).AttValue('Vehs(Current,Current,All)');
-         
-         v1 = cola1.AttValue('QlenMax(Current,Current)');
-         v2 = cola2.AttValue('QlenMax(Current,Current)');
-         v3 = cola3.AttValue('QlenMax(Current,Current)');
-         v4 = cola4.AttValue('QlenMax(Current,Current)');
-         v5 = cola5.AttValue('QlenMax(Current,Current)');
-         v6 = cola6.AttValue('QlenMax(Current,Current)');
-         v7 = cola7.AttValue('QlenMax(Current,Current)');
-         v8 = cola8.AttValue('QlenMax(Current,Current)');
-         
          qin = double([flujo_final1-flujo_inicial1 flujo_final2-flujo_inicial2 flujo_final3-flujo_inicial3 flujo_final4-flujo_inicial4]);
          
-         queue = [v1 v2+v3+v7 v4 v5+v6+v8];
-         aux=isnan(queue);
-         for j=1:4
-             if aux(j)==1
-                 queue(j)=1;
-             end
-         end
-         [t,x] = ode23s('replicator_equation_F_Q_tiempo_variable',Tspan,x0,[],qin,queue,s_flujo,s_queue,sum(x0));
+         [t,x] = ode23s('replicator_equation',Tspan,x0,[],qin,s,tiempoCiclo);
          disp(x(end,:));
-         disp('suma');
-         disp(x(end,1)+x(end,2)+x(end,3)+x(end,4));
-         disp('tiempo')
-         disp(tiempo)
-         
-         tiempos_semaforo(bandera,:) = x(end,:);
-         save('TiempoSemaforos.mat','tiempos_semaforo')
-         bandera = bandera+1;
  
          flujo_inicial1 = flujo_final1;
          flujo_inicial2 = flujo_final2;
          flujo_inicial3 = flujo_final3;
          flujo_inicial4 = flujo_final4;
-         
-         
-
               
+         contador=0;
      end
-     contador = contador+1;
+  tiempo = sim.get('AttValue', 'SimSec');
   
-  
-%% para cambiar flujos de trafico durante la simulación
-  switch tiempo
-      case 4500
-        q1 = 1500; %flujo de entrada
-        q2 = 1000; %Flujo de entrada
-        q3 = 1500;%Flujo de entrada
-        q4 = 1000;%Flujo de entrada
-        vehins = vnet.VehicleInputs;
-        vehin_1 = vehins.ItemByKey(1);
-        vehin_1.set('AttValue','Volume(1)',q1);
-        vehin_2 = vehins.ItemByKey(2);
-        vehin_2.set('AttValue','Volume(1)',q2);
-        vehin_3 = vehins.ItemByKey(3);
-        vehin_3.set('AttValue','Volume(1)',q3);
-        vehin_4 = vehins.ItemByKey(4);
-        vehin_4.set('AttValue','Volume(1)',q4);
-        
-      case 9000
-        q1 = 1000; %flujo de entrada
-        q2 = 1500; %Flujo de entrada
-        q3 = 1000;%Flujo de entrada
-        q4 = 1500;%Flujo de entrada
-        vehins = vnet.VehicleInputs;
-        vehin_1 = vehins.ItemByKey(1);
-        vehin_1.set('AttValue','Volume(1)',q1);
-        vehin_2 = vehins.ItemByKey(2);
-        vehin_2.set('AttValue','Volume(1)',q2);
-        vehin_3 = vehins.ItemByKey(3);
-        vehin_3.set('AttValue','Volume(1)',q3);
-        vehin_4 = vehins.ItemByKey(4);
-        vehin_4.set('AttValue','Volume(1)',q4);
-        
-        case 13500
-        q1 = 1000; %flujo de entrada
-        q2 = 500; %Flujo de entrada
-        q3 = 1000;%Flujo de entrada
-        q4 = 500;%Flujo de entrada
-        vehins = vnet.VehicleInputs;
-        vehin_1 = vehins.ItemByKey(1);
-        vehin_1.set('AttValue','Volume(1)',q1);
-        vehin_2 = vehins.ItemByKey(2);
-        vehin_2.set('AttValue','Volume(1)',q2);
-        vehin_3 = vehins.ItemByKey(3);
-        vehin_3.set('AttValue','Volume(1)',q3);
-        vehin_4 = vehins.ItemByKey(4);
-        vehin_4.set('AttValue','Volume(1)',q4);
-        
-        case 18000
-        q1 = 500; %flujo de entrada
-        q2 = 1000; %Flujo de entrada
-        q3 = 500;%Flujo de entrada
-        q4 = 1000;%Flujo de entrada
-        vehins = vnet.VehicleInputs;
-        vehin_1 = vehins.ItemByKey(1);
-        vehin_1.set('AttValue','Volume(1)',q1);
-        vehin_2 = vehins.ItemByKey(2);
-        vehin_2.set('AttValue','Volume(1)',q2);
-        vehin_3 = vehins.ItemByKey(3);
-        vehin_3.set('AttValue','Volume(1)',q3);
-        vehin_4 = vehins.ItemByKey(4);
-        vehin_4.set('AttValue','Volume(1)',q4);
-
-             
-
-  end
+% %% para cambiar flujos de trafico durante la simulación
+%   switch tiempo
+%       case 500
+%         q1 = 300; %flujo de entrada
+%         q2 = 10000; %Flujo de entrada
+%         q3 = 300;%Flujo de entrada
+%         q4 = 300;%Flujo de entrada
+%         vehins = vnet.VehicleInputs;
+%         vehin_1 = vehins.ItemByKey(1);
+%         vehin_1.set('AttValue','Volume(1)',q1);
+%         vehin_2 = vehins.ItemByKey(2);
+%         vehin_2.set('AttValue','Volume(1)',q2);
+%         vehin_3 = vehins.ItemByKey(3);
+%         vehin_3.set('AttValue','Volume(1)',q3);
+%         vehin_4 = vehins.ItemByKey(4);
+%         vehin_4.set('AttValue','Volume(1)',q4);
+%         
+%       case 1000
+%         q1 = 500; %flujo de entrada
+%         q2 = 500; %Flujo de entrada
+%         q3 = 500;%Flujo de entrada
+%         q4 = 500;%Flujo de entrada
+%         vehins = vnet.VehicleInputs;
+%         vehin_1 = vehins.ItemByKey(1);
+%         vehin_1.set('AttValue','Volume(1)',q1);
+%         vehin_2 = vehins.ItemByKey(2);
+%         vehin_2.set('AttValue','Volume(1)',q2);
+%         vehin_3 = vehins.ItemByKey(3);
+%         vehin_3.set('AttValue','Volume(1)',q3);
+%         vehin_4 = vehins.ItemByKey(4);
+%         vehin_4.set('AttValue','Volume(1)',q4);
+% 
+%       case 1500
+%         q1 = 1000; %flujo de entrada
+%         q2 = 1000; %Flujo de entrada
+%         q3 = 1000;%Flujo de entrada
+%         q4 = 1000;%Flujo de entrada
+%         vehins = vnet.VehicleInputs;
+%         vehin_1 = vehins.ItemByKey(1);
+%         vehin_1.set('AttValue','Volume(1)',q1);
+%         vehin_2 = vehins.ItemByKey(2);
+%         vehin_2.set('AttValue','Volume(1)',q2);
+%         vehin_3 = vehins.ItemByKey(3);
+%         vehin_3.set('AttValue','Volume(1)',q3);
+%         vehin_4 = vehins.ItemByKey(4);
+%         vehin_4.set('AttValue','Volume(1)',q4);
+%         
+%       case 2000
+%         q1 = 1200; %flujo de entrada
+%         q2 = 1200; %Flujo de entrada
+%         q3 = 1200;%Flujo de entrada
+%         q4 = 1200;%Flujo de entrada
+%         vehins = vnet.VehicleInputs;
+%         vehin_1 = vehins.ItemByKey(1);
+%         vehin_1.set('AttValue','Volume(1)',q1);
+%         vehin_2 = vehins.ItemByKey(2);
+%         vehin_2.set('AttValue','Volume(1)',q2);
+%         vehin_3 = vehins.ItemByKey(3);
+%         vehin_3.set('AttValue','Volume(1)',q3);
+%         vehin_4 = vehins.ItemByKey(4);
+%         vehin_4.set('AttValue','Volume(1)',q4);         
+% 
+%   end
 
 
       
@@ -242,4 +215,3 @@ while tiempo<period_time
 %% Delete Vissim-COM server (also closes the Vissim GUI)
 vis.release;
 disp('The end')
-save('TiempoSemaforos.mat','tiempos_semaforo')

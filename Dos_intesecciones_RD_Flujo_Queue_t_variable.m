@@ -113,26 +113,29 @@ cola11 = vnet.QueueCounter.ItemByKey(11);
 cola12 = vnet.QueueCounter.ItemByKey(12);
 cola13 = vnet.QueueCounter.ItemByKey(13);
 
-contador=0;
+contador1 = 0;
+contador2 = 0;
 Tspan = 1000;
-x10 = (tiempoCiclo/4)*[1 1 1 1]; %tiempos iniciales para semaforos
+x10 = [28 28 28 28 10]; %tiempos iniciales para semaforos
 sf1 = [182 289 228 255]; %valores de saturacion de las calles
 sq1 = [100 200 100 200]; %valores de saturacion de las calles
 qin1 = [0 0 0 0];
 x1 = x10;
 
-x20 = (tiempoCiclo/4)*[1 1 1 1]; %tiempos iniciales para semaforos
+x20 = [28 28 28 28 10]; %tiempos iniciales para semaforos
 %s2 = [379 364 52.5 383]; %valores de saturacion de las calles
 sf2 = [190 289 90 200]; %valores de saturacion de las calles
 sq2 = [100 200 100 100]; %valores de saturacion de las calles
 qin2 = [0 0 0 0];
 x2 = x20;
 
-aux = 1;
-
+tiempo = 0;
+aux1 = 1;
+aux2 = 1;
 %% Simulacion principal
-for i=0:((period_time*step_time)-2)
+while tiempo<period_time
  sim.RunSingleStep;
+ tiempo = sim.get('AttValue', 'SimSec');
  
 %  if contador == 0   %Flujo de trafico al inicio de cada ciclo
 %      flujo_inicial1 = vnet.DataCollectionMeasurement.ItemByKey(1).AttValue('Vehs(Current,Current,All)');
@@ -155,25 +158,25 @@ for i=0:((period_time*step_time)-2)
  semaforo24 = round(x2(end,4)); %tiempo*step_time para verde semaforo 4 (horizontal)
  
  % ASIGNACION ESTADOS INTERSECCION 1 
-     if contador<=semaforo11   
+     if contador1<=semaforo11   
          sg1_1.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg1_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador>semaforo11)&&(contador<=(semaforo11+semaforo12))
+     elseif (contador1>semaforo11)&&(contador1<=(semaforo11+semaforo12))
          sg1_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_2.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg1_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador > (semaforo11+semaforo12) )&&(contador <= (semaforo11+semaforo12+semaforo13) )
+     elseif (contador1 > (semaforo11+semaforo12) )&&(contador1 <= (semaforo11+semaforo12+semaforo13) )
          sg1_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_3.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg1_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador > (semaforo11+semaforo12+semaforo13) )&&(contador <=tiempoCiclo)
+     elseif (contador1 > (semaforo11+semaforo12+semaforo13) )&&(contador1 <=(semaforo11+semaforo12+semaforo13+semaforo14))
          sg1_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg1_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
@@ -181,34 +184,34 @@ for i=0:((period_time*step_time)-2)
      end
      
    % ASIGNACION ESTADOS INTERSECCION 2 
-     if contador<=semaforo21   
+     if contador2<=semaforo21   
          sg2_1.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg2_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador>semaforo21)&&(contador<=(semaforo21+semaforo22))
+     elseif (contador2>semaforo21)&&(contador2<=(semaforo21+semaforo22))
          sg2_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_2.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg2_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador > (semaforo21+semaforo22) )&&(contador <= (semaforo21+semaforo22+semaforo23) )
+     elseif (contador2 > (semaforo21+semaforo22) )&&(contador2 <= (semaforo21+semaforo22+semaforo23) )
          sg2_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_3.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
          sg2_4.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          
-     elseif (contador > (semaforo21+semaforo22+semaforo23) )&&(contador <=tiempoCiclo)
+     elseif (contador2 > (semaforo21+semaforo22+semaforo23) )&&(contador2 <=(semaforo21+semaforo22+semaforo23+semaforo24))
          sg2_1.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_2.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_3.set('AttValue','State',1); % 1:rojo 2:amarillo 3:verde
          sg2_4.set('AttValue','State',3); % 1:rojo 2:amarillo 3:verde
      end
-     contador = contador+1;
-     
-     if contador == tiempoCiclo-1 % Si ya se cumple el ciclo, se mide flujos y se reinicia "contador"
-         
+
+     % INTERSECCION 1
+     if contador1 == semaforo11+semaforo12+semaforo13+semaforo14 % Si ya se cumple el ciclo, se mide flujos y se reinicia "contador"
+         contador1=0;
          %INTERSECCION 1 
          %Flujos
          flujo1_final1 = vnet.DataCollectionMeasurement.ItemByKey(1).AttValue('Vehs(Current,Current,All)');
@@ -225,9 +228,38 @@ for i=0:((period_time*step_time)-2)
          v6 = cola6.AttValue('Qlen(Current,Current)');
          v7 = cola7.AttValue('Qlen(Current,Current)');
          v8 = cola8.AttValue('Qlen(Current,Current)');
-         Cola_Actual_1 = [v1 v2+v3+v7 v4 v5+v6+v8];
+        queue1 = [v1 v2+v3+v7 v4 v5+v6+v8];
+        band1=isnan(queue1);
+        for j=1:4
+             if band1(j)==1
+                 queue1(j)=1;
+             end
+        end %% Para evitar NaN
          
-         %INTERSECCION 2 
+        
+         
+         [t1,x1] = ode23s('replicator_equation_F_Q_tiempo_variable',Tspan,x10,[],qin1,queue1,sf1,sq1,sum(x10));
+         disp('Interseccion 1:');
+         disp(x1(end,:));
+         texto1 = sprintf('Suma %f',sum(x1(end,1:4)));
+         disp(texto1)
+         tiempo1(aux1,:)=x1(end,:);
+         
+         
+         aux1=aux1+1;
+
+         flujo1_inicial1 = flujo1_final1;
+         flujo1_inicial2 = flujo1_final2;
+         flujo1_inicial3 = flujo1_final3;
+         flujo1_inicial4 = flujo1_final4;
+         
+         
+              
+     end
+     
+     if contador2 == semaforo21+semaforo22+semaforo23+semaforo24 % Si ya se cumple el ciclo, se mide flujos y se reinicia "contador"
+         contador2=0;
+          %INTERSECCION 2 
          %Flujos
          flujo2_final1 = vnet.DataCollectionMeasurement.ItemByKey(5).AttValue('Vehs(Current,Current,All)');
          flujo2_final2 = vnet.DataCollectionMeasurement.ItemByKey(6).AttValue('Vehs(Current,Current,All)');
@@ -240,41 +272,36 @@ for i=0:((period_time*step_time)-2)
          v11 = cola11.AttValue('Qlen(Current,Current)');
          v12 = cola12.AttValue('Qlen(Current,Current)');
          v13 = cola13.AttValue('Qlen(Current,Current)');
-         Cola_Actual_2 = [v9 v10+v11 v12 v13];
+         queue2 = [v9 v10+v11 v12 v13];
+         band2=isnan(queue2);
+         for j=1:4
+             if band2(j)==1
+                 queue2(j)=1;
+             end
+         end %% Para evitar NaN
          
-         [t1,x1] = ode23s('replicator_equation_F_Q',Tspan,x10,[],qin1,Cola_Actual_1,sf1,sq1,tiempoCiclo);
-         disp('Interseccion 1:');
-         disp(x1(end,:));
-         tiempo1(aux,:)=x1(end,:);
-         
-         [t2,x2] = ode23s('replicator_equation_F_Q',Tspan,x20,[],qin2,Cola_Actual_2,sf2,sq2,tiempoCiclo);
+         [t2,x2] = ode23s('replicator_equation_F_Q_tiempo_variable',Tspan,x20,[],qin2,queue2,sf2,sq2,sum(x20));
          disp('Interseccion 2:');
          disp(x2(end,:));
-         tiempo2(aux,:)=x2(end,:);
-         
-         aux=aux+1;
-         %INTERSECCION 1
-         flujo1_inicial1 = flujo1_final1;
-         flujo1_inicial2 = flujo1_final2;
-         flujo1_inicial3 = flujo1_final3;
-         flujo1_inicial4 = flujo1_final4;
-         
-         %INTERSECCION 2
+         texto2 = sprintf('Suma %f',sum(x2(end,1:4)));
+         disp(texto2)
+         tiempo2(aux2,:)=x2(end,:);
+         aux2=aux2+1;
+
          flujo2_inicial1 = flujo2_final1;
          flujo2_inicial2 = flujo2_final2;
          flujo2_inicial3 = flujo2_final3;
          flujo2_inicial4 = flujo2_final4;
-              
+         
      end
-     if contador == tiempoCiclo
-        contador=0;
-     end 
-  %tiempo = sim.get('AttValue', 'SimSec');
      
      
+    contador1 = contador1+1;   
+    contador2 = contador2+1;
+    
+    
 end
-tiempos = [tiempo1 tiempo2];
-csvwrite('TiempoSemaforosRD.dat',tiempos);
+
 %% Delete Vissim-COM server (also closes the Vissim GUI)
 vis.release;
 disp('The end')
